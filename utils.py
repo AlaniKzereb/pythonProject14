@@ -12,7 +12,8 @@ def get_data_by_sql(sql):
 
 # шаг 1
 def get_movie(title):
-    """Возвращает информацию о фольме по названию"""
+    """Возвращает информацию о фильме по названию"""
+    result = ""
     sql = f"""
                 select title, country, release_year, listed_in as genre, description from netflix
                 where title = '{title}'
@@ -42,32 +43,19 @@ def get_movie_by_release_year(year_first, year_second):
 # шаг 3
 def get_movie_for_age(age):
     """Возвращает фильмы, соответсвующие категории возраста"""
+    age_rating = {"children": ('G', 'G'), "family": ('G', 'PG', 'PG-13'), "adult": ('R', 'NC-17')}
+
     result = []
-    if age == "children":
-        sql = f"""
+
+    sql = f"""
             select title, rating, description from netflix
-            where rating in ('G')
+            where rating in {age_rating.get(age)}
             """
-        for i in get_data_by_sql(sql):
-            result.append(dict(i))
-
-    elif age == "family":
-        sql = f"""
-                select title, rating, description from netflix
-                where rating in ('G', 'PG', 'PG-13')
-                """
-        for i in get_data_by_sql(sql):
-            result.append(dict(i))
-
-    elif age == "adult":
-        sql = f"""
-                    select title, rating, description from netflix
-                    where rating in ('R', 'NC-17')
-                    """
-        for i in get_data_by_sql(sql):
-            result.append(dict(i))
+    for i in get_data_by_sql(sql):
+        result.append(dict(i))
 
     return result
+
 
 
 # шаг 4
@@ -103,12 +91,13 @@ def get_actors(first_actor, second_actor):
         for name in names:
             names_dict[name.strip()] = names_dict.get(name.strip(), 0) + 1
 
-
+    result = []
     for key, value in names_dict.items():
         if value >= 2:
-            print(key)
+            result.append(key)
 
-
+    return result
+# print(get_actors('Rose McIver', 'Ben Lamb'))
 # шаг 6
 def get_movies_by_criteria(type, release_year, genre):
     """Возвращает информацию о фильмах по указанным критериям"""
